@@ -110,3 +110,11 @@ All messages are sent in JSON format to the server using the following unified m
 
 14. **Handle client downtime**:  
     If you shut down the `device-simulator`, the messages will stop, but as soon as you restart the simulation, messages will resume appearing on your WebSocket client.
+
+## Automated testing
+There is an intergration test in `device-monitor` service that ensures that all the endpoints work in the right way.
+
+```bash
+cargo test -p device-monitor --test main --all-features -- integration_testing
+```
+
