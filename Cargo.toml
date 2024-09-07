@@ -1,0 +1,7 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "device-monitor",
+    "device-simulator",
+]
