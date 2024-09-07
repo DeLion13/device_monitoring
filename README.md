@@ -68,16 +68,16 @@ All messages are sent in JSON format to the server using the following unified m
 
 4. **Start the server**:
     ```bash
-    cargo run --bin device-monitor
+    RUST_LOG=info cargo run --bin device-monitor
     ```
 
 5. **Start the client**:
     ```bash
-    cargo run --bin device-simulator
+    RUST_LOG=debug cargo run --bin device-simulator
     ```
 
 6. **Enable logging** (optional):  
-   You can enable logging using the environment variable `RUST_LOG=<info/warn/debug/error>` to see logs for debugging or monitoring purposes.
+   You can enable logging using the environment variable `RUST_LOG=<info/warn/debug/error>` to see logs for debugging or monitoring purposes. I suggested my logging levels in higher but they are not mandatory. You may use your own or avoid them at all.
 
 7. **Testing with Postman**:  
    Use Postman to test the API and manage WebSocket connections.
@@ -90,7 +90,7 @@ All messages are sent in JSON format to the server using the following unified m
 
     ```json
     {
-        "device_id": "<1/2/3>"
+        "subscribe": "<1/2/3>"
     }
     ```
 

@@ -60,8 +60,8 @@ pub(crate) async fn subscribe_client_for_device(
             let mut subs = subscriptions.lock().await;
 
             // Add new subscriber for `device_id`
-            let vec = subs
-                .entry(subscribe_request.device_id.clone())
+            let vec: &mut Vec<UnboundedSender<Message>> = subs
+                .entry(subscribe_request.subscribe.clone())
                 .or_insert_with(Vec::new);
 
             // Also possible to use HashSet, but for that I would
@@ -69,7 +69,7 @@ pub(crate) async fn subscribe_client_for_device(
             vec.push(client_tx.clone());
             vec.dedup_by(|a, b| a.same_channel(b));
 
-            info!("User subscribed on device: {}", subscribe_request.device_id);
+            info!("User subscribed on device: {}", subscribe_request.subscribe);
         }
         Err(err) => {
             warn!("Failed to parse [`SubscribeRequest`]: {err}");
@@ -79,14 +79,15 @@ pub(crate) async fn subscribe_client_for_device(
 
 /// Removes client-specific sender from the [`Subscriptions`]
 /// so the system won't ever try to send updates there
-pub(crate) async fn unsubscribe_client(subscriptions: Subscriptions, client_tx: UnboundedSender<Message>) {
+pub(crate) async fn unsubscribe_client(
+    subscriptions: Subscriptions,
+    client_tx: UnboundedSender<Message>,
+) {
     let mut subs = subscriptions.lock().await;
 
-    subs
-        .iter_mut()
-        .for_each(|(_, senders)| {
-            if let Some(index) = senders.iter().position(|x| x.same_channel(&client_tx)) {
-                senders.remove(index);
-            }
-        });
+    subs.iter_mut().for_each(|(_, senders)| {
+        if let Some(index) = senders.iter().position(|x| x.same_channel(&client_tx)) {
+            senders.remove(index);
+        }
+    });
 }

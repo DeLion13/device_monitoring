@@ -10,5 +10,5 @@ pub(crate) type Subscriptions = Arc<Mutex<HashMap<String, Vec<UnboundedSender<Me
 /// Scheme to parse a subscription request
 #[derive(Deserialize, Serialize)]
 pub(crate) struct SubscribeRequest {
-    pub device_id: String,
+    pub subscribe: String,
 }
