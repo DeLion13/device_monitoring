@@ -56,8 +56,8 @@ async fn handle_post(
                     continue;
                 }
             };
-            if let Err(e) = subscriber.send(Message::text(msg)) {
-                error!("Failed sending via WebSocket: {:?}", e);
+            if let Err(err) = subscriber.send(Message::text(msg)) {
+                error!("Failed sending via WebSocket: {err}");
             }
         }
     }
@@ -65,6 +65,7 @@ async fn handle_post(
     Ok(warp::reply::json(&"Messages sent"))
 }
 
+/// Handles each WS connection and creates a separate client for subscriptions
 async fn handle_ws(ws: WebSocket, subscriptions: Subscriptions) {
     let (ws_tx, mut ws_rx) = ws.split();
 
@@ -84,12 +85,15 @@ async fn handle_ws(ws: WebSocket, subscriptions: Subscriptions) {
                         .await;
                 } else if message.is_close() {
                     info!("WebSocket connection is closed\nMessage: {message:#?}");
-                    break;
+
+                    // Remove client-specific sender from subscribers.
+                    // That action will destroy the task with receiver
+                    unsubscribe_client(subscriptions.clone(), client_tx.clone()).await;
                 }
             }
-            Err(e) => {
-                error!("Error occured for WebSocket: {}", e);
-                break;
+            Err(err) => {
+                error!("Error occured for WebSocket: {err}");
+                return;
             }
         }
     }

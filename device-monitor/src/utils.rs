@@ -24,6 +24,7 @@ pub(crate) fn spawn_redirection_task(
 
     let mut ws_tx = ws_tx;
 
+    // Closes if the `client_tx` (sender) is destroyed
     tokio::spawn(async move {
         // When channel receive a message, it redirects
         // it right to corresponding WebSocket client
@@ -31,7 +32,6 @@ pub(crate) fn spawn_redirection_task(
             // Send message to WebSocket client
             if let Err(err) = ws_tx.send(message).await {
                 error!("Failed to send message to WebSocket client: {err}");
-                break;
             }
         }
     });
@@ -75,4 +75,18 @@ pub(crate) async fn subscribe_client_for_device(
             warn!("Failed to parse [`SubscribeRequest`]: {err}");
         }
     };
+}
+
+/// Removes client-specific sender from the [`Subscriptions`]
+/// so the system won't ever try to send updates there
+pub(crate) async fn unsubscribe_client(subscriptions: Subscriptions, client_tx: UnboundedSender<Message>) {
+    let mut subs = subscriptions.lock().await;
+
+    subs
+        .iter_mut()
+        .for_each(|(_, senders)| {
+            if let Some(index) = senders.iter().position(|x| x.same_channel(&client_tx)) {
+                senders.remove(index);
+            }
+        });
 }
