@@ -96,7 +96,7 @@ All messages are sent in JSON format to the server using the following unified m
 
 10. **View WebSocket client data**:  
     You will see the corresponding messages from the subscribed devices:
-<img width="1409" alt="Screenshot 2024-09-07 at 17 02 52" src="https://github.com/user-attachments/assets/f3cd20ee-9801-40f7-823c-7bb1878b7139">
+<img width="1417" alt="Screenshot 2024-09-07 at 18 20 18" src="https://github.com/user-attachments/assets/7a072794-b9f0-43cb-a0c1-99c90bf92821">
 
 
 11. **Manage subscriptions**:  
